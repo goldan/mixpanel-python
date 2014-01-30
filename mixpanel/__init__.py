@@ -282,18 +282,18 @@ class Consumer(object):
 
     def _write_request(self, request_url, json_message):
         data = urllib.parse.urlencode({
-            'data': base64.b64encode(json_message),
+            'data': base64.b64encode(json_message.encode('utf8')),
             'verbose':1,
             'ip':0,
         })
         try:
-            request = urllib.request.Request(request_url, data)
+            request = urllib.request.Request(request_url, data.encode('utf8'))
             response = urllib.request.urlopen(request).read()
         except urllib.error.HTTPError as e:
             raise MixpanelException(e)
 
         try:
-            response = json.loads(response)
+            response = json.loads(response.decode('utf8'))
         except ValueError:
             raise MixpanelException('Cannot interpret Mixpanel server response: {0}'.format(response))
 
