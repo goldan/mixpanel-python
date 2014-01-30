@@ -1,8 +1,8 @@
 import base64
 import json
 import time
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 
 '''
 The mixpanel package allows you to easily track events and
@@ -278,18 +278,18 @@ class Consumer(object):
         if endpoint in self._endpoints:
             self._write_request(self._endpoints[endpoint], json_message)
         else:
-            raise MixpanelException('No such endpoint "{0}". Valid endpoints are one of {1}'.format(self._endpoints.keys()))
+            raise MixpanelException('No such endpoint "{0}". Valid endpoints are one of {1}'.format(list(self._endpoints.keys())))
 
     def _write_request(self, request_url, json_message):
-        data = urllib.urlencode({
+        data = urllib.parse.urlencode({
             'data': base64.b64encode(json_message),
             'verbose':1,
             'ip':0,
         })
         try:
-            request = urllib2.Request(request_url, data)
-            response = urllib2.urlopen(request).read()
-        except urllib2.HTTPError as e:
+            request = urllib.request.Request(request_url, data)
+            response = urllib.request.urlopen(request).read()
+        except urllib.error.HTTPError as e:
             raise MixpanelException(e)
 
         try:
@@ -337,7 +337,7 @@ class BufferedConsumer(object):
         :raises: MixpanelException
         '''
         if endpoint not in self._buffers:
-            raise MixpanelException('No such endpoint "{0}". Valid endpoints are one of {1}'.format(self._buffers.keys()))
+            raise MixpanelException('No such endpoint "{0}". Valid endpoints are one of {1}'.format(list(self._buffers.keys())))
 
         buf = self._buffers[endpoint]
         buf.append(json_message)
@@ -359,7 +359,7 @@ class BufferedConsumer(object):
 
         :raises: MixpanelException
         '''
-        for endpoint in self._buffers.keys():
+        for endpoint in list(self._buffers.keys()):
             self._flush_endpoint(endpoint)
 
     def _flush_endpoint(self, endpoint):
